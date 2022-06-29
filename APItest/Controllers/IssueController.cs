@@ -36,6 +36,17 @@ namespace APItest.Controllers
             return issue == null ? NotFound() : Ok(issue); // in case it's null the NotFound() will generate 404 status code in the response; if not Ok() will generate a 200 status code; these methodes come from a ControllerBase class
         }
 
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public async Task<IActionResult> Create(Issue issue)
+        {
+            // here we add the Issues submitted by the request to the Issues collection exposed by the context
+            await _context.Issues.AddAsync(issue);
+            await _context.SaveChangesAsync(); // <- this will propagate the changes to the db
 
+            // use CreatedAtAction for the response, will return the status code and the location in the editor;
+            // it takes 3 params: the action that returns a single Issue, the id of the Issue as an anonymous object, and the issue itself
+            return CreatedAtAction(nameof(GetById), new {id = issue.Id}, issue);
+        }
     }
 }
