@@ -48,5 +48,21 @@ namespace APItest.Controllers
             // it takes 3 params: the action that returns a single Issue, the id of the Issue as an anonymous object, and the issue itself
             return CreatedAtAction(nameof(GetById), new {id = issue.Id}, issue);
         }
+
+        [HttpPut("{id}")] // the id placeholder specifies that the id will be in the URL
+        [ProducesResponseType(StatusCodes.Status204NoContent)]  
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Update(int id, Issue issue) // the id param will be bound to the id in the URL, and the issue param will be bound to the body in the request
+        {
+            // first we check if there is a mismatch between the id in the URL and the id in the body
+            // if it is the case we will return a bad request
+            if (id != issue.Id) return BadRequest();
+            //otherwise we update the issue
+            _context.Entry(issue).State = EntityState.Modified;
+            await _context.SaveChangesAsync(); // and propagate changes to the db
+
+            return NoContent(); //this will return a 204 status code in the response
+        }
+
     }
 }
