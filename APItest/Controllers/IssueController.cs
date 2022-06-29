@@ -22,8 +22,20 @@ namespace APItest.Controllers
         // an Action Method is a public method that is executed in response to an HTTP request
         // we create an Action Methid that will be mapped to the HTTP verb GET, in oreder to get a list of Issues
         [HttpGet]
-        public async Task<IEnumerable<Issue>> Get() // Look this up! 
+        public async Task<IEnumerable<Issue>> Get() // Look this up!    
+            => await _context.Issues.ToListAsync();    
         
-            => await _context.Issues.ToListAsync();      
+        // this method will get a single Issue
+        // the id in the URL will be bound to the id parameter of the method
+       [HttpGet("{id}")]
+       [ProducesResponseType(typeof(Issue), StatusCodes.Status200OK)]   // this just enhances the documentation
+       [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var issue = await _context.Issues.FindAsync(id);
+            return issue == null ? NotFound() : Ok(issue); // in case it's null the NotFound() will generate 404 status code in the response; if not Ok() will generate a 200 status code; these methodes come from a ControllerBase class
+        }
+
+
     }
 }
