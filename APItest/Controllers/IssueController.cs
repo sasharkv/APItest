@@ -64,5 +64,22 @@ namespace APItest.Controllers
             return NoContent(); //this will return a 204 status code in the response
         }
 
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            // first we check if the issue exists
+            var issueToDelete = await _context.Issues.FindAsync(id);
+            if (issueToDelete ==  null) return NotFound();// if it doesn't - return not found
+
+            // otherwise we delete the issue and return a NoContent result
+            _context.Issues.Remove(issueToDelete);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
     }
 }
